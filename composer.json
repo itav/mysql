@@ -1,0 +1,17 @@
+{
+    "name": "itav/mysql",
+    "authors": [
+        {
+            "name": "Sylwester Kowalski",
+            "email": "sylwester7799@gmail.com"
+        }
+    ],
+    "require": {
+
+    },
+    "autoload": {
+        "psr-4": {
+            "Itav\\Component\\Mysql\\": "src/"
+        }
+    }
+}
