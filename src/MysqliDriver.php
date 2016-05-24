@@ -15,6 +15,9 @@ class MysqliDriver extends AbstractDriver implements DriverInterface
             $this->_loaded = false;
             return;
         }
+        if (method_exists($this, '_driver_shutdown')) {
+            register_shutdown_function(array($this, '_driver_shutdown'));
+        }
         parent::__construct($dbhost, $dbuser, $dbpasswd, $dbname);
     }
 
