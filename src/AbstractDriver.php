@@ -20,7 +20,7 @@ abstract class AbstractDriver implements DriverInterface
 
     public function __construct($dbhost, $dbuser, $dbpasswd, $dbname)
     {
-        $this->Connect($dbhost, $dbuser, $dbpasswd, $dbname);
+        $this->connect($dbhost, $dbuser, $dbpasswd, $dbname);
     }
 
     /**
@@ -30,7 +30,7 @@ abstract class AbstractDriver implements DriverInterface
      * @param $dbname
      * @return bool|null
      */
-    protected function Connect($dbhost, $dbuser, $dbpasswd, $dbname)
+    protected function connect($dbhost, $dbuser, $dbpasswd, $dbname)
     {
         if (method_exists($this, '_driver_shutdown')) {
             register_shutdown_function(array($this, '_driver_shutdown'));
@@ -274,7 +274,7 @@ abstract class AbstractDriver implements DriverInterface
 
     protected function _driver_setencoding($name)
     {
-        $this->execute('SET NAMES ?', array($name));
+        return $this->execute('SET NAMES ?', array($name));
     }
 
     public function groupConcat($field, $separator = ',')
@@ -317,4 +317,6 @@ abstract class AbstractDriver implements DriverInterface
     abstract protected function _driver_concat($func_get_args);
 
     abstract protected function _driver_affected_rows();
+
+    abstract protected function _driver_shutdown();
 }
