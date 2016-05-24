@@ -124,7 +124,7 @@ class MysqliDriver extends AbstractDriver implements DriverInterface
     protected function _driver_listtables()
     {
         return $this->getCol('SELECT table_name FROM information_schema.tables
-				WHERE table_type = ? AND table_schema = ?', array('BASE TABLE', $this->_dbname));
+				WHERE table_type = ? AND table_schema = ?', ['BASE TABLE', $this->_dbname]);
     }
 
     protected function _driver_begintrans()
@@ -158,7 +158,7 @@ class MysqliDriver extends AbstractDriver implements DriverInterface
         $this->execute('UNLOCK TABLES');
     }
 
-    protected function _driver_lastinsertid()
+    protected function _driver_lastinsertid($table = null)
     {
         return $this->getOne('SELECT LAST_INSERT_ID()');
     }

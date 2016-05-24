@@ -221,7 +221,7 @@ abstract class AbstractDriver implements DriverInterface
         return $this->_driver_setencoding($name);
     }
 
-    public function getLastInsertId($table = NULL)
+    public function getLastInsertId($table = null)
     {
         return $this->_driver_lastinsertid($table);
     }
@@ -231,7 +231,7 @@ abstract class AbstractDriver implements DriverInterface
         return $this->_quote_value($input);
     }
 
-    protected function _query_parser($query, $inputarray = NULL)
+    protected function _query_parser($query, $inputarray = null)
     {
         //Jeżeli uzywamy mysql'a tylko to nie trzeba podmieniać now i like
         //$query = preg_replace('/\?NOW\?/i', $this->_driver_now(), $query);
@@ -253,7 +253,7 @@ abstract class AbstractDriver implements DriverInterface
 
     protected function _quote_value($input)
     {
-        if ($input === NULL) {
+        if ($input === null) {
             return 'NULL';
         } elseif (gettype($input) == 'string') {
             return '\'' . addcslashes($input, "'\\\0") . '\'';
