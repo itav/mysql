@@ -2,43 +2,44 @@
 
 namespace Itav\Component\Mysql;
 
-interface DriverInterface {
+interface DriverInterface
+{
 
-    public function Execute($query, $inputarray = NULL);
+    public function execute($query, $inputarray = null);
 
-    public function GetAll($query = NULL, $inputarray = NULL);
+    public function getAll($query = null, $inputarray = null);
 
-    public function GetAllByKey($query = NULL, $key = NULL, $inputarray = NULL);
+    public function getAllByKey($query = null, $key = null, $inputarray = null);
 
-    public function GetRow($query = NULL, $inputarray = NULL);
+    public function getRow($query = null, $inputarray = null);
 
-    public function GetCol($query = NULL, $inputarray = NULL);
+    public function getCol($query = null, $inputarray = null);
 
-    public function GetOne($query = NULL, $inputarray = NULL);
+    public function getOne($query = null, $inputarray = null);
 
-    public function Concat();
+    public function concat();
 
-    public function Now();
+    public function now();
 
-    public function ListTables();
+    public function listTables();
 
-    public function BeginTrans();
+    public function beginTrans();
 
-    public function CommitTrans();
+    public function commitTrans();
 
-    public function RollbackTrans();
+    public function rollbackTrans();
 
-    public function LockTables($table, $locktype = null);
+    public function lockTables($table, $locktype = null);
 
-    public function UnLockTables();
+    public function unLockTables();
 
-    public function GetDBVersion();
+    public function getDBVersion();
 
-    public function SetEncoding($name);
+    public function setEncoding($name);
 
-    public function GetLastInsertID($table = NULL);
+    public function getLastInsertId($table = null);
 
-    public function Escape($input);
+    public function escape($input);
 
-    public function GroupConcat($field, $separator = ',');
+    public function groupConcat($field, $separator = ',');
 }

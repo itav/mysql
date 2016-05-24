@@ -2,7 +2,8 @@
 
 namespace Itav\Component\Mysql;
 
-abstract class AbstractDriver {
+abstract class AbstractDriver implements DriverInterface
+{
 
     protected $_version = '0.1';
     protected $_loaded = false;
@@ -17,11 +18,20 @@ abstract class AbstractDriver {
     protected $errors = [];
     protected $debug = false;
 
-    public function __construct($dbhost, $dbuser, $dbpasswd, $dbname) {
+    public function __construct($dbhost, $dbuser, $dbpasswd, $dbname)
+    {
         $this->Connect($dbhost, $dbuser, $dbpasswd, $dbname);
     }
 
-    protected function Connect($dbhost, $dbuser, $dbpasswd, $dbname) {
+    /**
+     * @param $dbhost
+     * @param $dbuser
+     * @param $dbpasswd
+     * @param $dbname
+     * @return bool|null
+     */
+    protected function Connect($dbhost, $dbuser, $dbpasswd, $dbname)
+    {
         if (method_exists($this, '_driver_shutdown')) {
             register_shutdown_function(array($this, '_driver_shutdown'));
         }
@@ -37,16 +47,23 @@ abstract class AbstractDriver {
         }
     }
 
-    public function Destroy() {
+    public function destroy()
+    {
         return $this->_driver_disconnect();
     }
 
-    public function Execute($query, $inputarray = NULL) {
+    /**
+     * @param $query
+     * @param null $inputarray
+     * @return mixed
+     */
+    public function execute($query, $inputarray = NULL)
+    {
         if (!$this->_driver_execute($this->_query_parser($query, $inputarray))) {
-            $this->errors[] = array(
+            $this->errors[] = [
                 'query' => $this->_query,
                 'error' => $this->_driver_geterror()
-            );
+            ];
         } elseif ($this->debug) {
             $this->errors[] = array(
                 'query' => $this->_query,
@@ -56,9 +73,10 @@ abstract class AbstractDriver {
         return $this->_driver_affected_rows();
     }
 
-    public function GetAll($query = NULL, $inputarray = NULL) {
+    public function getAll($query = NULL, $inputarray = NULL)
+    {
         if ($query) {
-            $this->Execute($query, $inputarray);
+            $this->execute($query, $inputarray);
         }
 
         $result = NULL;
@@ -70,9 +88,10 @@ abstract class AbstractDriver {
         return $result;
     }
 
-    public function GetAllByKey($query = NULL, $key = NULL, $inputarray = NULL) {
+    public function getAllByKey($query = NULL, $key = NULL, $inputarray = NULL)
+    {
         if ($query) {
-            $this->Execute($query, $inputarray);
+            $this->execute($query, $inputarray);
         }
 
         $result = NULL;
@@ -84,17 +103,19 @@ abstract class AbstractDriver {
         return $result;
     }
 
-    public function GetRow($query = NULL, $inputarray = NULL) {
+    public function getRow($query = NULL, $inputarray = NULL)
+    {
         if ($query) {
-            $this->Execute($query, $inputarray);
+            $this->execute($query, $inputarray);
         }
 
         return $this->_driver_fetchrow_assoc();
     }
 
-    public function GetCol($query = NULL, $inputarray = NULL) {
+    public function getCol($query = NULL, $inputarray = NULL)
+    {
         if ($query) {
-            $this->Execute($query, $inputarray);
+            $this->execute($query, $inputarray);
         }
 
         $result = NULL;
@@ -106,9 +127,10 @@ abstract class AbstractDriver {
         return $result;
     }
 
-    public function GetOne($query = NULL, $inputarray = NULL) {
+    public function getOne($query = NULL, $inputarray = NULL)
+    {
         if ($query) {
-            $this->Execute($query, $inputarray);
+            $this->execute($query, $inputarray);
         }
 
         $result = null;
@@ -118,9 +140,10 @@ abstract class AbstractDriver {
         return $result;
     }
 
-    // with Exec() & FetchRow() we can do big results looping
-    // in less memory consumptive way than using GetAll() & foreach()
-    protected function Exec($query, $inputarray = NULL) {
+    // with exec() & FetchRow() we can do big results looping
+    // in less memory consumptive way than using getAll() & foreach()
+    protected function exec($query, $inputarray = NULL)
+    {
         if (!$this->_driver_execute($this->_query_parser($query, $inputarray))) {
             $this->errors[] = array(
                 'query' => $this->_query,
@@ -140,69 +163,86 @@ abstract class AbstractDriver {
         }
     }
 
-    public function FetchRow($result) {
+    public function FetchRow($result)
+    {
         return $this->_driver_fetchrow_assoc($result);
     }
 
-    public function Concat() {
+    public function concat()
+    {
         return $this->_driver_concat(func_get_args());
     }
 
-    public function Now() {
+    /**
+     * @return int
+     */
+    public function now()
+    {
         return $this->_driver_now();
     }
 
-    public function ListTables() {
+    public function listTables()
+    {
         return $this->_driver_listtables();
     }
 
-    public function BeginTrans() {
+    public function beginTrans()
+    {
         return $this->_driver_begintrans();
     }
 
-    public function CommitTrans() {
+    public function commitTrans()
+    {
         return $this->_driver_committrans();
     }
 
-    public function RollbackTrans() {
+    public function rollbackTrans()
+    {
         return $this->_driver_rollbacktrans();
     }
 
-    public function LockTables($table, $locktype = null) {
+    public function lockTables($table, $locktype = null)
+    {
         return $this->_driver_locktables($table, $locktype);
     }
 
-    public function UnLockTables() {
+    public function unLockTables()
+    {
         return $this->_driver_unlocktables();
     }
 
-    public function GetDBVersion() {
+    public function getDBVersion()
+    {
         return $this->_driver_dbversion();
     }
 
-    public function SetEncoding($name) {
+    public function setEncoding($name)
+    {
         return $this->_driver_setencoding($name);
     }
 
-    public function GetLastInsertID($table = NULL) {
+    public function getLastInsertId($table = NULL)
+    {
         return $this->_driver_lastinsertid($table);
     }
 
-    public function Escape($input) {
+    public function escape($input)
+    {
         return $this->_quote_value($input);
     }
 
-    protected function _query_parser($query, $inputarray = NULL) {
-        // najpierw sparsujmy wszystkie specjalne meta śmieci.
-        $query = preg_replace('/\?NOW\?/i', $this->_driver_now(), $query);
-        $query = preg_replace('/\?LIKE\?/i', $this->_driver_like(), $query);
+    protected function _query_parser($query, $inputarray = NULL)
+    {
+        //Jeżeli uzywamy mysql'a tylko to nie trzeba podmieniać now i like
+        //$query = preg_replace('/\?NOW\?/i', $this->_driver_now(), $query);
+        //$query = preg_replace('/\?LIKE\?/i', $this->_driver_like(), $query);
 
         if ($inputarray) {
             $queryelements = explode("\0", str_replace('?', "?\0", $query));
             $query = '';
             foreach ($queryelements as $queryelement) {
                 if (strpos($queryelement, '?') !== FALSE) {
-                    list($key, $value) = each($inputarray);
+                    $value = each($inputarray)['value'];
                     $queryelement = str_replace('?', $this->_quote_value($value), $queryelement);
                 }
                 $query .= $queryelement;
@@ -211,10 +251,8 @@ abstract class AbstractDriver {
         return $query;
     }
 
-    protected function _quote_value($input) {
-        // jeżeli baza danych wymaga innego eskejpowania niż to, driver
-        // powinien nadpisać tą funkcję
-
+    protected function _quote_value($input)
+    {
         if ($input === NULL) {
             return 'NULL';
         } elseif (gettype($input) == 'string') {
@@ -224,23 +262,59 @@ abstract class AbstractDriver {
         }
     }
 
-    // Funkcje bezpieczeństwa, tj. na wypadek gdyby driver ich nie
-    // zdefiniował.
-
-    protected function _driver_now() {
+    protected function _driver_now()
+    {
         return time();
     }
 
-    protected function _driver_like() {
+    protected function _driver_like()
+    {
         return 'LIKE';
     }
 
-    protected function _driver_setencoding($name) {
-        $this->Execute('SET NAMES ?', array($name));
+    protected function _driver_setencoding($name)
+    {
+        $this->execute('SET NAMES ?', array($name));
     }
 
-    public function GroupConcat($field, $separator = ',') {
+    public function groupConcat($field, $separator = ',')
+    {
         return $this->_driver_groupconcat($field, $separator);
     }
 
+    abstract protected function _driver_connect($dbhost, $dbuser, $dbpasswd, $dbname);
+
+    abstract protected function _driver_geterror();
+
+    abstract protected function _driver_execute($_query_parser);
+
+    abstract protected function _driver_disconnect();
+
+    abstract protected function _driver_lastinsertid($table = null);
+
+    abstract protected function _driver_dbversion();
+
+    abstract protected function _driver_unlocktables();
+
+    abstract protected function _driver_fetchrow_assoc($result = null);
+
+    abstract protected function _driver_listtables();
+
+    abstract protected function _driver_rollbacktrans();
+
+    abstract protected function _driver_groupconcat($field, $separator);
+
+    abstract protected function _driver_locktables($table, $locktype);
+
+    abstract protected function _driver_committrans();
+
+    abstract protected function _driver_begintrans();
+
+    abstract protected function _driver_fetchrow_num();
+
+    abstract protected function _driver_num_rows();
+
+    abstract protected function _driver_concat($func_get_args);
+
+    abstract protected function _driver_affected_rows();
 }
