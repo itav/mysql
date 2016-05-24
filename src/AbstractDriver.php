@@ -32,6 +32,9 @@ abstract class AbstractDriver implements DriverInterface
      */
     protected function connect($dbhost, $dbuser, $dbpasswd, $dbname)
     {
+        if (method_exists($this, 'closeConnection')) {
+            register_shutdown_function([$this, 'closeConnection']);
+        }
         if ($this->_driver_connect($dbhost, $dbuser, $dbpasswd, $dbname)) {
             return $this->_dblink;
         } else {
@@ -227,6 +230,16 @@ abstract class AbstractDriver implements DriverInterface
         return $this->_quote_value($input);
     }
 
+    public function groupConcat($field, $separator = ',')
+    {
+        return $this->_driver_groupconcat($field, $separator);
+    }
+
+    public function closeConnection()
+    {
+        $this->_driver_shutdown();
+    }
+
     protected function _query_parser($query, $inputarray = null)
     {
         //Jeżeli uzywamy mysql'a tylko to nie trzeba podmieniać now i like
@@ -271,11 +284,6 @@ abstract class AbstractDriver implements DriverInterface
     protected function _driver_setencoding($name)
     {
         return $this->execute('SET NAMES ?', array($name));
-    }
-
-    public function groupConcat($field, $separator = ',')
-    {
-        return $this->_driver_groupconcat($field, $separator);
     }
 
     abstract protected function _driver_connect($dbhost, $dbuser, $dbpasswd, $dbname);

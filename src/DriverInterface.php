@@ -42,4 +42,6 @@ interface DriverInterface
     public function escape($input);
 
     public function groupConcat($field, $separator = ',');
+
+    public function closeConnection();
 }
