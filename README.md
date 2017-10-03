@@ -1,1 +1,1 @@
-#readme 2.0.0 asdfasdfasdf
+* Very simple mysql client for php
